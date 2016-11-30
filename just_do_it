@@ -1,0 +1,2 @@
+#!/bin/bash
+nasm -f bin loader.asm -o loader && nasm -f bin program.asm -o program && cat loader program>result&&dd if=result of=disk.img bs=512 conv=sync && qemu-system-i386 disk.img $1 && rm loader && rm program && rm result
