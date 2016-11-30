@@ -195,11 +195,9 @@ readLine:
     pop ebp
     ret
 
-; ДОДЕЛАТЬ!
-; int_32 readInt(int_32* error)
+; int_32 readInt(int_32* result)
 ; success code in eax
 ; result in first argument
-; cf = 1 if error
 readInt:
     push ebp
     mov ebp, esp
@@ -253,13 +251,16 @@ readInt:
         jng .break_pow_lp
         .pow_lp:
             imul ebx, 10
+            jo .error
             loop .pow_lp
         .break_pow_lp:
         pop ecx
         
         imul eax, ebx
+        jo .error
         add edx, eax; добавляем очередную цифру
-        
+        jo .error
+                
         inc esi
         loop .lp
         .endlp:
@@ -284,6 +285,103 @@ readInt:
     mov esp, ebp
     pop ebp    
     ret
+
+; int_32 parseInt(char_8* buff, int size, int_32* result)
+; success code in eax
+; result in first argument
+parseInt:
+    push ebp
+    mov ebp, esp
+    
+    push ebx
+    push ecx
+    push edx
+    push esi
+    push edi
+    
+    mov edi, [ebp+2+4]; result - адрес на который указывает аргумент
+    mov ebx, [ebp+2+12]; buff
+    ;mov ebx, [ebx]
+    
+    mov ecx, [ebp+2+8]; size
+    xor esi, esi; итератор
+    xor edx, edx; аккумулятор
+    
+    
+    .lp:; перебираем строку с конца    
+        xor eax, eax; зануляем eax
+        mov al, [ebx+ecx-1]; считываем символ
+
+        cmp ecx, 1; если нулевой символ, проверяем знак
+        jnz .next
+        cmp al, '-'
+        jnz .next
+        ; Обрабатываем минус
+        neg edx; меняем знак
+        jmp .endlp
+        .next:
+        
+        ;pusha
+;        mov ah, 0x0e
+;        mov bl, 0
+;        int 0x10
+;        popa
+        
+        ; проверяем соответствует ли он ascii коду цифры
+        cmp al, '0'
+        jl .error
+        cmp al, '9'
+        jg .error
+        
+        
+        
+        sub al, '0'
+        ; вычисляем 10 в степени номер цифры
+        push ebx
+        push ecx
+        mov ebx, 1
+        mov ecx, esi; степень
+        cmp ecx, 0
+        jng .break_pow_lp
+        .pow_lp:
+            imul ebx, 10
+            jo .error
+            loop .pow_lp
+        .break_pow_lp:
+        pop ecx
+        
+        imul eax, ebx
+        jo .error
+        add edx, eax; добавляем очередную цифру
+        jo .error
+        pop ebx
+                
+        inc esi
+        loop .lp
+        .endlp:
+        
+;    mov edx, 666
+    mov [edi], edx; пишем по адресу на который указывает первый аргумент
+    
+    
+    xor eax, eax; ошибки нет
+    mov eax, 0
+    jmp .noerror
+    .error:
+    mov eax, 1; ошибка есть
+    .noerror:
+    
+    pop edi
+    pop esi
+    pop edx
+    pop ecx
+    pop ebx
+        
+    mov esp, ebp
+    pop ebp    
+    ret
+
+
 ;int_32 strlen(char_8* buff)
 strlen:
     push ebp 

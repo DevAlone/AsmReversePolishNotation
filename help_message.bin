@@ -1,0 +1,19 @@
+NAME
+	AsmReversePolishNotation - a program for calculation mathematical expressions
+
+DESCRIPTION
+	This program uses stack for calculation mathematial expression. You can enter tokens which are integer numbers or arithmetical operations.
+	If you enter a number, the program puts it on the stack, if you enter an operation, the program gets the right amount of numbers from the stack, applies operation to them and puts result to top of stack
+	The following operations are available:
+		'+' - addition
+		'-' - subtraction
+		'*' - multiplication
+		'/' - division
+		'%' - taking the remainder of the division
+		'**' - the construction of the power
+
+
+
+
+
+My english is bad, I know.
