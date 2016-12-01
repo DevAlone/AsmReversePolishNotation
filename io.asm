@@ -381,6 +381,24 @@ parseInt:
     pop ebp    
     ret
 
+;void printNewLine()
+printNewLine:
+    push eax
+    push ebx
+    
+    mov al, 13
+    mov ah, 0x0e
+    mov bl, 0
+    int 0x10
+    mov al, 10
+    mov ah, 0x0e
+    mov bl, 0
+    int 0x10
+
+    pop ebx
+    pop eax
+    
+    ret
 
 ;int_32 strlen(char_8* buff)
 strlen:
