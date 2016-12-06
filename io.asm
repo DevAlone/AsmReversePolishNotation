@@ -1,6 +1,52 @@
 section .bss
     char_buff_10 resb 10; просто буфер для хранения промежуточных данных
 section .text
+;void printChar(char_8* buff)
+printChar:
+    push ebp
+    mov ebp, esp
+    
+    push eax
+    push ebx
+    push ecx
+    
+    mov al, [ebp+2+4]    
+    ; если \t
+    cmp al, 9
+    je .proc_tab
+    jmp .next
+    .proc_tab:
+    mov ecx, 4
+    .tab_lp: ; выводим 4 пробела
+        mov al, ' '
+        mov ah, 0x0e
+        mov bl, 0
+        int 0x10
+        loop .tab_lp
+        
+    .next:
+    ; иначе выводим символ
+    mov ah, 0x0e
+    mov bl, 0
+    int 0x10
+    
+    ; если \n добавляем \r
+    cmp al, 10
+    jne .end
+    mov al, 13
+    mov ah, 0x0e
+    mov bl, 0
+    int 0x10
+    
+    .end:
+    
+    pop ecx
+    pop ebx
+    pop eax
+    
+    mov esp, ebp
+    pop ebp
+    ret
 ; void print(char_8* buff)
 print:
     ; сохраняем положение вершины стека, 
@@ -20,11 +66,34 @@ print:
         cmp al, 0
         ; если нулевой символ, выходим
         jz .end_lp
+        ; если \t
+        cmp al, 9
+        je .proc_tab
+        jmp .next
+        .proc_tab:
+        mov ecx, 4
+        .tab_lp: ; выводим 4 пробела
+            mov al, ' '
+            mov ah, 0x0e
+            mov bl, 0
+            int 0x10
+            loop .tab_lp
+            
+        .next:
         ; иначе выводим символ
         mov ah, 0x0e
         mov bl, 0
         int 0x10
         inc esi
+        
+        ; если \n добавляем \r
+        cmp al, 10
+        jne .lp
+        mov al, 13
+        mov ah, 0x0e
+        mov bl, 0
+        int 0x10
+        
         jmp .lp
     .end_lp:
     ; делаем всё как было до вызова функции
@@ -38,25 +107,9 @@ print:
     ret
 ; void println(char_8* buff)
 println:
-    push ebp
-    mov ebp, esp
-    
-    push eax
-    push ebx
-    push esi
-    
-    mov esi, [ebp+2+4]; первый аргумент
-
-    .lp:; посимвольно выводим
-        mov al, [esi]    
-        cmp al, 0
-        jz .end_lp
-        mov ah, 0x0e
-        mov bl, 0
-        int 0x10
-        inc esi
-        jmp .lp
-    .end_lp:
+    push dword [esp+2]
+    call print
+    add esp, 4
     ; добавляем возврат каретки и перенос строки
     mov al, 13; \r
     mov ah, 0x0e
@@ -67,17 +120,9 @@ println:
     mov ah, 0x0e
     mov bl, 0
     int 0x10
-    
 
-
-    pop esi    
-    pop ebx
-    pop eax
-
-    mov esp, ebp
-    pop ebp
     ret
-
+    
 ; void printInt(int value)
 printInt:
     push ebp
