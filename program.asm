@@ -65,8 +65,6 @@ main:
     mov [token_buffer_length], eax
     
     
-    
-    
     ;push dword token_buffer
     ;call println
     ;add esp, 4
@@ -140,22 +138,53 @@ main:
         PUSH_A_STACK eax        
         jmp .break
     .case_pow: ; возведение в степень
+        POP_A_STACK ecx
+        POP_A_STACK ebx
         
+        mov eax, 1
+        cmp ecx, 0
+        je .endlp
+        .lp:
+            imul eax, ebx
+            loop .lp
+        .endlp:
+        PUSH_A_STACK eax
         jmp .break
     .case_div:
-;        POP_A_STACK eax
-;        POP_A_STACK ebx
-;        idiv ebx, eax
-;        PUSH_A_STACK ebx        
+        POP_A_STACK ebx
+        POP_A_STACK eax
+        xor edx, edx
+        cmp ebx, 0
+        je .error
+        idiv ebx
+        PUSH_A_STACK eax        
         jmp .break
     .case_remainder_of_div:
-
+        POP_A_STACK ebx
+        POP_A_STACK eax
+        xor edx, edx
+        cmp ebx, 0
+        je .error
+        idiv ebx
+        PUSH_A_STACK edx
         jmp .break
     .case_bit_and: ; побитовое и
+        POP_A_STACK eax
+        POP_A_STACK ebx
+        and eax, ebx
+        PUSH_A_STACK eax
         jmp .break
     .case_bit_or: ; побитовое или
+        POP_A_STACK eax
+        POP_A_STACK ebx
+        or eax, ebx
+        PUSH_A_STACK eax
         jmp .break
     .case_bit_xor: ; побитовое исключающее или
+        POP_A_STACK eax
+        POP_A_STACK ebx
+        xor eax, ebx
+        PUSH_A_STACK eax
         jmp .break
     .case_default:
         ; парсим число

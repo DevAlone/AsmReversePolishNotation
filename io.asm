@@ -182,6 +182,8 @@ printInt:
     pop ebp
     ret
 
+; тут баг с переходом на новую строку
+; после перехода на новую строку backspace стирает содержимое массива, но не стирает с экрана
 ; int_32 readLine(char_8 *buff, int count)
 readLine:
     push ebp
@@ -212,8 +214,33 @@ readLine:
         jz .endlp
         cmp al, 10;\n
         jz .endlp
+        
+        cmp al, 8;\b backspace
+        jz .backspace_handler
+        
+        ; пишем в массив
         mov [edi+esi], al
         inc esi   
+        jmp .print_char
+        .backspace_handler:
+        cmp esi, 0
+        je .readlp
+        
+        dec esi
+        ; выводим backspace
+        mov al, 8
+        mov ah, 0x0e
+        mov bl, 0
+        int 0x10
+        ; пробельный символ
+        mov al, ' '
+        mov ah, 0x0e
+        mov bl, 0
+        int 0x10
+        ; и потом ещё один backspace
+        mov al, 8
+        .print_char:
+        ; выводим на экран
         mov ah, 0x0e
         mov bl, 0
         int 0x10
