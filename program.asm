@@ -12,7 +12,7 @@ section .bss
 section .data
    unrecognized_token db 9,"unrecognized token", 0
    err_message db "error", 0
-   input_message db "enter token or ? for getting help: ", 0
+   input_message db "enter token or ? for help: ", 0
    stack_top_message db "stack top is ", 0
    empty_string db 0
    arithmetical_stack_top dd 0; 
@@ -51,18 +51,49 @@ section .text
 
 ; собсно код
 main:
+	mov ah, 0 ; Устанавливаем видео-режим
+	mov al, 0x0d
+	int 0x10
+
+	;mov ah, 0x09
+	;mov bh, 0
+	;mov al, '1'
+	;mov cx, 10
+	;mov bl, 0001b
+	;int 0x10
+	
+	;mov al, '2'
+	;mov ah, 0x0e
+	;mov bl, 0001b
+	;int 0x10
+	;jmp $
+ 	push dword 0111b
+	call setCharColor
+	add esp, 4
+ 
     mov [arithmetical_stack_top], dword -1
 
     .loop:
+	push dword 1010b
+	call setCharColor
+	add esp, 4
+ 
     push dword input_message
     call print
     add esp, 4
-    
+   
+	push dword 0011b
+	call setCharColor
+	add esp, 4
+ 
     push dword token_buffer
     push dword 255
     call readLine
     add esp, 8
     mov [token_buffer_length], eax
+ 	push dword 0111b
+	call setCharColor
+	add esp, 4
     
     
     ;push dword token_buffer
@@ -267,7 +298,7 @@ printHelp:
     push eax
     push ecx
     
-    .lp:        
+;    .lp:        
         xor ecx, ecx
         xor ebx, ebx; счётчик переносов строки
         xor edx, edx; счётчик символов в строке
@@ -327,7 +358,7 @@ printHelp:
         ;mov ah, 0
         int 0x16
         
-    jmp .lp    
+;    jmp .lp    
     
     pop ecx
     pop eax

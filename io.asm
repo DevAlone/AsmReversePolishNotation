@@ -1,6 +1,15 @@
 section .bss
     char_buff_10 resb 10; просто буфер для хранения промежуточных данных
+section .data
+	current_ch_color dd 1111b
 section .text
+; void setCharColor(int_32 color)
+setCharColor: 
+	push eax
+	mov eax, [esp+2+4]
+	mov [current_ch_color], eax
+	pop eax
+	ret
 ;void printChar(char_8* buff)
 printChar:
     push ebp
@@ -20,14 +29,14 @@ printChar:
     .tab_lp: ; выводим 4 пробела
         mov al, ' '
         mov ah, 0x0e
-        mov bl, 0
+        mov bl, [current_ch_color]
         int 0x10
         loop .tab_lp
         
     .next:
     ; иначе выводим символ
     mov ah, 0x0e
-    mov bl, 0
+    mov bl, [current_ch_color]
     int 0x10
     
     ; если \n добавляем \r
@@ -35,7 +44,7 @@ printChar:
     jne .end
     mov al, 13
     mov ah, 0x0e
-    mov bl, 0
+    mov bl, [current_ch_color]
     int 0x10
     
     .end:
@@ -75,15 +84,15 @@ print:
         .tab_lp: ; выводим 4 пробела
             mov al, ' '
             mov ah, 0x0e
-            mov bl, 0
+            mov bl, [current_ch_color]
             int 0x10
             loop .tab_lp
             
         .next:
         ; иначе выводим символ
         mov ah, 0x0e
-        mov bl, 0
-        int 0x10
+        mov bl, [current_ch_color]
+	int 0x10
         inc esi
         
         ; если \n добавляем \r
@@ -91,7 +100,7 @@ print:
         jne .lp
         mov al, 13
         mov ah, 0x0e
-        mov bl, 0
+        mov bl, [current_ch_color]
         int 0x10
         
         jmp .lp
@@ -113,12 +122,12 @@ println:
     ; добавляем возврат каретки и перенос строки
     mov al, 13; \r
     mov ah, 0x0e
-    mov bl, 0
+    mov bl, [current_ch_color]
     int 0x10
     
     mov al, 10; \n
     mov ah, 0x0e
-    mov bl, 0
+    mov bl, [current_ch_color]
     int 0x10
 
     ret
@@ -144,7 +153,7 @@ printInt:
         pusha
         mov al, '-'
         mov ah, 0x0e
-        mov bl, 0
+        mov bl, [current_ch_color]
         int 0x10
         popa
 ;    mov eax, 1591
@@ -168,7 +177,7 @@ printInt:
         dec edi
         mov al, [edi]
         mov ah, 0x0e
-        mov bl, 0
+        mov bl, [current_ch_color]
         int 0x10
         loop .outlp
      
@@ -230,19 +239,19 @@ readLine:
         ; выводим backspace
         mov al, 8
         mov ah, 0x0e
-        mov bl, 0
+        mov bl, [current_ch_color]
         int 0x10
         ; пробельный символ
         mov al, ' '
         mov ah, 0x0e
-        mov bl, 0
+        mov bl, [current_ch_color]
         int 0x10
         ; и потом ещё один backspace
         mov al, 8
         .print_char:
         ; выводим на экран
         mov ah, 0x0e
-        mov bl, 0
+        mov bl, [current_ch_color]
         int 0x10
         loop .readlp
     .endlp:
@@ -251,11 +260,11 @@ readLine:
 
     mov al, 10    
     mov ah, 0x0e
-    mov bl, 0
+    mov bl, [current_ch_color]
     int 0x10
     mov al, 13    
     mov ah, 0x0e
-    mov bl, 0
+    mov bl, [current_ch_color]
     int 0x10
 
         
@@ -460,11 +469,11 @@ printNewLine:
     
     mov al, 13
     mov ah, 0x0e
-    mov bl, 0
+    mov bl, [current_ch_color]
     int 0x10
     mov al, 10
     mov ah, 0x0e
-    mov bl, 0
+    mov bl, [current_ch_color]
     int 0x10
 
     pop ebx
